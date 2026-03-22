@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#fff9ee" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="修正月齢" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+    <title>修正週数・修正月齢 計算アプリ</title>
+    <style>
+      :root {
+        --paper: #fff9ee;
+        --paper-edge: #e6d8c7;
+        --ink: #4a3a31;
+        --mint: #94d6c6;
+        --peach: #ffc9a9;
+        --sky: #b8dcff;
+        --berry: #f58a8a;
+        --accent: #2f8f83;
+        --warn: #d25050;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+        color: var(--ink);
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(circle at 12% 14%, #ffe8cf 0 9%, transparent 10%),
+          radial-gradient(circle at 86% 18%, #d8f0ff 0 10%, transparent 11%),
+          radial-gradient(circle at 20% 86%, #d9f5e3 0 11%, transparent 12%),
+          repeating-linear-gradient(
+            -9deg,
+            #f6efe2 0 15px,
+            #f9f2e8 15px 30px
+          );
+      }
+
+      .app {
+        position: relative;
+        width: min(720px, 100%);
+        background: var(--paper);
+        border: 2px solid var(--paper-edge);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 14px 0 #eadbca, 0 22px 30px rgba(74, 58, 49, 0.2);
+        animation: pop-in 0.5s ease-out;
+      }
+
+      .app::before,
+      .app::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        opacity: 0.9;
+        z-index: 0;
+      }
+
+      .app::before {
+        width: 78px;
+        height: 78px;
+        top: -24px;
+        right: 18px;
+        background: var(--peach);
+        box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.65);
+        animation: floaty 3.8s ease-in-out infinite;
+      }
+
+      .app::after {
+        width: 44px;
+        height: 44px;
+        bottom: -12px;
+        left: 24px;
+        background: var(--mint);
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.65);
+        animation: floaty 4.3s ease-in-out infinite reverse;
+      }
+
+      main > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(1.45rem, 4vw, 2rem);
+        line-height: 1.35;
+        letter-spacing: 0.02em;
+      }
+
+      .desc {
+        margin: 0 0 16px;
+        color: #705f55;
+        font-size: 0.96rem;
+        line-height: 1.7;
+      }
+
+      .note {
+        margin-top: 8px;
+        display: inline-block;
+        background: #fff1df;
+        border: 1px dashed #ebbf9b;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.88rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+
+      label {
+        font-weight: 700;
+        font-size: 0.93rem;
+      }
+
+      input,
+      select {
+        width: 100%;
+        border: 2px solid #d3c1ae;
+        border-radius: 14px;
+        padding: 11px 12px;
+        font-size: 1rem;
+        background: #fffefb;
+        color: var(--ink);
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      .actions {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      button {
+        border: 2px solid #d3c1ae;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: transform 0.12s ease, filter 0.12s ease;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.03);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      #calc {
+        background: linear-gradient(135deg, var(--berry), #f9a595);
+        color: #fff;
+        border-color: #ef8f80;
+      }
+
+      #reset {
+        background: linear-gradient(135deg, #fef5e8, #f5e3ca);
+        color: #5d4d45;
+      }
+
+      .error {
+        min-height: 1.2em;
+        color: var(--warn);
+        margin-top: 12px;
+        font-weight: 700;
+      }
+
+      .result {
+        margin-top: 18px;
+        border-top: 2px dashed #dfcebc;
+        padding-top: 16px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .result-row {
+        background: linear-gradient(160deg, #fffdfa, #fff4ea);
+        border: 1px solid #efdcc8;
+        border-radius: 14px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .value {
+        font-size: 1.18rem;
+        font-weight: 800;
+        color: #2a6f66;
+      }
+
+      @keyframes floaty {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      @keyframes pop-in {
+        from {
+          opacity: 0;
+          transform: translateY(8px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .app {
+          padding: 18px;
+          border-radius: 20px;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .result-row {
+          flex-direction: column;
+          gap: 4px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <h1>修正週数・修正月齢 計算アプリ</h1>
+      <p class="desc">
+        在胎週数（出生時）と生後年齢（日またはか月）を入力すると、修正週数と修正月齢を計算します。
+      </p>
+
+      <div class="grid">
+        <div class="field">
+          <label for="gaWeeks">在胎週数（週）</label>
+          <input id="gaWeeks" type="number" min="20" max="45" value="30" oninput="calculate()" />
+        </div>
+        <div class="field">
+          <label for="gaDays">在胎週数（日）</label>
+          <input id="gaDays" type="number" min="0" max="6" value="0" oninput="calculate()" />
+        </div>
+        <div class="field">
+          <label for="postnatalAgeValue">生後年齢（数値）</label>
+          <input id="postnatalAgeValue" type="number" min="0" value="60" oninput="calculate()" />
+        </div>
+        <div class="field">
+          <label for="postnatalAgeUnit">生後年齢の単位</label>
+          <select id="postnatalAgeUnit" onchange="calculate()">
+            <option value="days" selected>日</option>
+            <option value="months">か月</option>
+          </select>
+        </div>
+      </div>
+      <p class="note">※ か月入力は 1か月 = 30日 で換算します。</p>
+
+      <div class="actions">
+        <button id="calc" type="button" onclick="calculate()">計算する</button>
+        <button id="reset" type="button" onclick="resetForm()">リセット</button>
+      </div>
+
+      <p id="error" class="error" aria-live="polite"></p>
+
+      <section class="result" aria-live="polite">
+        <div class="result-row">早産補正日数（40週との差）<span id="prematurityDaysValue" class="value">-</span></div>
+        <div class="result-row">修正週数（週・日）<span id="correctedWeeksDays" class="value">-</span></div>
+        <div class="result-row">修正月齢（40週基準）<span id="correctedAgeFromTerm" class="value">-</span></div>
+      </section>
+    </main>
+
+    <script>
+      function formatWeeksDays(totalDays) {
+        const weeks = Math.floor(totalDays / 7);
+        const days = totalDays % 7;
+        return `${weeks}週${days}日`;
+      }
+
+      function formatSignedMonthsDays(totalDays) {
+        const sign = totalDays < 0 ? "-" : "";
+        const absDays = Math.abs(totalDays);
+        const months = Math.floor(absDays / 30);
+        const days = absDays % 30;
+        return `${sign}${months}か月${days}日`;
+      }
+
+      function toPostnatalDays(value, unit) {
+        if (unit === "months") {
+          return Math.round(value * 30);
+        }
+        return value;
+      }
+
+      function calculate() {
+        const gaWeeksEl = document.getElementById("gaWeeks");
+        const gaDaysEl = document.getElementById("gaDays");
+        const postnatalAgeValueEl = document.getElementById("postnatalAgeValue");
+        const postnatalAgeUnitEl = document.getElementById("postnatalAgeUnit");
+        const prematurityDaysValueEl = document.getElementById("prematurityDaysValue");
+        const correctedWeeksDaysEl = document.getElementById("correctedWeeksDays");
+        const correctedAgeFromTermEl = document.getElementById("correctedAgeFromTerm");
+        const errorEl = document.getElementById("error");
+
+        if (
+          !gaWeeksEl ||
+          !gaDaysEl ||
+          !postnatalAgeValueEl ||
+          !postnatalAgeUnitEl ||
+          !prematurityDaysValueEl ||
+          !correctedWeeksDaysEl ||
+          !correctedAgeFromTermEl ||
+          !errorEl
+        ) {
+          return;
+        }
+
+        errorEl.textContent = "";
+
+        const gaWeeks = Number(gaWeeksEl.value);
+        const gaDays = Number(gaDaysEl.value);
+        const postnatalAgeValue = Number(postnatalAgeValueEl.value);
+        const postnatalAgeUnit = postnatalAgeUnitEl.value;
+
+        if (
+          !Number.isFinite(gaWeeks) ||
+          !Number.isFinite(gaDays) ||
+          !Number.isFinite(postnatalAgeValue)
+        ) {
+          errorEl.textContent = "数値を入力してください。";
+          return;
+        }
+        if (gaWeeks < 20 || gaWeeks > 45) {
+          errorEl.textContent = "在胎週数（週）は20〜45で入力してください。";
+          return;
+        }
+        if (gaDays < 0 || gaDays > 6) {
+          errorEl.textContent = "在胎週数（日）は0〜6で入力してください。";
+          return;
+        }
+        if (postnatalAgeValue < 0) {
+          errorEl.textContent = "生後年齢は0以上で入力してください。";
+          return;
+        }
+
+        const postnatalDays = toPostnatalDays(postnatalAgeValue, postnatalAgeUnit);
+        const gestationalAgeDays = gaWeeks * 7 + gaDays;
+
+        // 40週（280日）未満で生まれた分だけ修正する
+        const prematurityDays = Math.max(0, 280 - gestationalAgeDays);
+        const correctedAgeDays = postnatalDays - prematurityDays;
+        const correctedGestationalDays = gestationalAgeDays + postnatalDays;
+        prematurityDaysValueEl.textContent = `${prematurityDays}日`;
+        correctedWeeksDaysEl.textContent = formatWeeksDays(correctedGestationalDays);
+        correctedAgeFromTermEl.textContent = formatSignedMonthsDays(correctedAgeDays);
+      }
+
+      function resetForm() {
+        const gaWeeksEl = document.getElementById("gaWeeks");
+        const gaDaysEl = document.getElementById("gaDays");
+        const postnatalAgeValueEl = document.getElementById("postnatalAgeValue");
+        const postnatalAgeUnitEl = document.getElementById("postnatalAgeUnit");
+        const prematurityDaysValueEl = document.getElementById("prematurityDaysValue");
+        const correctedWeeksDaysEl = document.getElementById("correctedWeeksDays");
+        const correctedAgeFromTermEl = document.getElementById("correctedAgeFromTerm");
+        const errorEl = document.getElementById("error");
+
+        gaWeeksEl.value = "30";
+        gaDaysEl.value = "0";
+        postnatalAgeValueEl.value = "60";
+        postnatalAgeUnitEl.value = "days";
+        errorEl.textContent = "";
+        prematurityDaysValueEl.textContent = "-";
+        correctedWeeksDaysEl.textContent = "-";
+        correctedAgeFromTermEl.textContent = "-";
+        calculate();
+      }
+
+      calculate();
+
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js").catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

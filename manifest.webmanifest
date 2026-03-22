@@ -1,0 +1,18 @@
+{
+  "name": "修正週数・修正月齢 計算アプリ",
+  "short_name": "修正月齢",
+  "description": "在胎週数と生後年齢から修正週数・修正月齢を計算するアプリ",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff9ee",
+  "theme_color": "#fff9ee",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
