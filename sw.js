@@ -1,5 +1,5 @@
-const CACHE_NAME = "corrected-age-app-v1";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
+const CACHE_NAME = "corrected-age-app-v2";
+const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
