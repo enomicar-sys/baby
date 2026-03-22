@@ -4,38 +4,44 @@
       <stop offset="0%" stop-color="#fff4ea" />
       <stop offset="100%" stop-color="#ffe9d2" />
     </linearGradient>
-    <pattern id="felt" width="12" height="12" patternUnits="userSpaceOnUse">
-      <circle cx="3" cy="3" r="1.1" fill="#ffffff88" />
-    </pattern>
+    <linearGradient id="bottleBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f7fbff" />
+    </linearGradient>
+    <linearGradient id="milk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff7e8" />
+      <stop offset="100%" stop-color="#ffeecf" />
+    </linearGradient>
+    <linearGradient id="cap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd6dc" />
+      <stop offset="100%" stop-color="#f3aeb8" />
+    </linearGradient>
   </defs>
 
   <rect width="512" height="512" rx="120" fill="url(#bg)" />
   <rect x="30" y="30" width="452" height="452" rx="108" fill="none" stroke="#efcfaa" stroke-width="12" />
 
-  <ellipse cx="256" cy="416" rx="130" ry="32" fill="#d2b495" opacity="0.35" />
+  <ellipse cx="256" cy="420" rx="120" ry="26" fill="#d2b495" opacity="0.35" />
 
-  <circle cx="256" cy="228" r="122" fill="#ffd9c2" stroke="#e9b79b" stroke-width="12" />
-  <circle cx="256" cy="228" r="122" fill="url(#felt)" opacity="0.5" />
+  <g transform="translate(256 250) rotate(-8) translate(-256 -250)">
+    <rect x="210" y="72" width="92" height="58" rx="28" fill="#ffe6ea" stroke="#e6b3bc" stroke-width="10" />
+    <rect x="226" y="58" width="60" height="32" rx="14" fill="#ffd4db" stroke="#e6b3bc" stroke-width="8" />
+    <path d="M234 56 Q256 24 278 56" fill="#f6c2ca" stroke="#e0a7b1" stroke-width="8" />
 
-  <path d="M150 170 Q256 90 362 170 Q346 112 308 92 Q286 80 256 78 Q226 80 204 92 Q166 112 150 170Z"
-        fill="#7a5a46" />
-  <path d="M176 172 Q256 112 336 172" fill="none" stroke="#f6e8da" stroke-width="8" stroke-dasharray="8 10" />
+    <rect x="182" y="118" width="148" height="274" rx="68" fill="url(#bottleBody)" stroke="#9bc1db" stroke-width="10" />
+    <rect x="194" y="214" width="124" height="168" rx="56" fill="url(#milk)" />
+    <line x1="194" y1="214" x2="318" y2="214" stroke="#f0d9b8" stroke-width="6" />
 
-  <circle cx="208" cy="228" r="14" fill="#3a2b24" />
-  <circle cx="304" cy="228" r="14" fill="#3a2b24" />
-  <circle cx="202" cy="222" r="4" fill="#fff" opacity="0.7" />
-  <circle cx="298" cy="222" r="4" fill="#fff" opacity="0.7" />
+    <rect x="182" y="118" width="148" height="52" rx="26" fill="url(#cap)" stroke="#e39aa8" stroke-width="8" />
+    <line x1="192" y1="144" x2="320" y2="144" stroke="#f8dae0" stroke-width="5" stroke-dasharray="6 8" />
 
-  <ellipse cx="256" cy="260" rx="26" ry="18" fill="#fff4e8" stroke="#e7c7ae" stroke-width="6" />
-  <path d="M220 298 Q256 332 292 298" fill="none" stroke="#3a2b24" stroke-width="10" stroke-linecap="round" />
+    <line x1="212" y1="182" x2="212" y2="360" stroke="#9bc1db" stroke-width="4" />
+    <line x1="236" y1="182" x2="236" y2="360" stroke="#9bc1db" stroke-width="4" />
+    <line x1="260" y1="182" x2="260" y2="360" stroke="#9bc1db" stroke-width="4" />
+    <line x1="284" y1="182" x2="284" y2="360" stroke="#9bc1db" stroke-width="4" />
+    <line x1="308" y1="182" x2="308" y2="360" stroke="#9bc1db" stroke-width="4" />
 
-  <ellipse cx="184" cy="260" rx="18" ry="12" fill="#f5a3a3" opacity="0.8" />
-  <ellipse cx="328" cy="260" rx="18" ry="12" fill="#f5a3a3" opacity="0.8" />
-
-  <path d="M104 346 Q256 430 408 346 Q396 404 358 430 Q316 458 256 460 Q196 458 154 430 Q116 404 104 346Z"
-        fill="#b7d9ff" stroke="#89b8ea" stroke-width="10" />
-  <path d="M136 356 Q256 418 376 356" fill="none" stroke="#ffffffcc" stroke-width="8" stroke-dasharray="8 10" />
-
-  <circle cx="364" cy="368" r="20" fill="#ffd27f" stroke="#e5af56" stroke-width="8" />
-  <path d="M354 368h20M364 358v20" stroke="#fff7e8" stroke-width="5" stroke-linecap="round" />
+    <circle cx="256" cy="272" r="14" fill="#ffd4db" stroke="#e4a3b0" stroke-width="6" />
+    <path d="M246 272h20M256 262v20" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+  </g>
 </svg>
