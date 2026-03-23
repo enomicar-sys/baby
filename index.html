@@ -263,7 +263,7 @@
     <main class="app">
       <h1>修正週数・修正月齢 計算アプリ</h1>
       <p class="desc">
-        在胎週数（出生時）と生後年齢（日またはか月）を入力すると、修正週数と修正月齢を計算します。
+        在胎週数（出生時）と生後年齢（か月・日）を入力すると、修正週数と修正月齢を計算します。
       </p>
 
       <div class="grid">
@@ -276,18 +276,15 @@
           <input id="gaDays" type="number" min="0" max="6" value="0" oninput="calculate()" />
         </div>
         <div class="field">
-          <label for="postnatalAgeValue">生後年齢（数値）</label>
-          <input id="postnatalAgeValue" type="number" min="0" value="60" oninput="calculate()" />
+          <label for="postnatalAgeMonths">生後年齢（か月）</label>
+          <input id="postnatalAgeMonths" type="number" min="0" value="2" oninput="calculate()" />
         </div>
         <div class="field">
-          <label for="postnatalAgeUnit">生後年齢の単位</label>
-          <select id="postnatalAgeUnit" onchange="calculate()">
-            <option value="days" selected>日</option>
-            <option value="months">か月</option>
-          </select>
+          <label for="postnatalAgeDays">生後年齢（日）</label>
+          <input id="postnatalAgeDays" type="number" min="0" max="30" value="0" oninput="calculate()" />
         </div>
       </div>
-      <p class="note">※ か月入力は 1か月 = 30日 で換算します。</p>
+      <p class="note">※ 1か月 = 30日 として換算します。</p>
 
       <div class="actions">
         <button id="calc" type="button" onclick="calculate()">計算する</button>
@@ -318,18 +315,15 @@
         return `${sign}${months}か月${days}日`;
       }
 
-      function toPostnatalDays(value, unit) {
-        if (unit === "months") {
-          return Math.round(value * 30);
-        }
-        return value;
+      function toPostnatalDays(months, days) {
+        return months * 30 + days;
       }
 
       function calculate() {
         const gaWeeksEl = document.getElementById("gaWeeks");
         const gaDaysEl = document.getElementById("gaDays");
-        const postnatalAgeValueEl = document.getElementById("postnatalAgeValue");
-        const postnatalAgeUnitEl = document.getElementById("postnatalAgeUnit");
+        const postnatalAgeMonthsEl = document.getElementById("postnatalAgeMonths");
+        const postnatalAgeDaysEl = document.getElementById("postnatalAgeDays");
         const prematurityDaysValueEl = document.getElementById("prematurityDaysValue");
         const correctedWeeksDaysEl = document.getElementById("correctedWeeksDays");
         const correctedAgeFromTermEl = document.getElementById("correctedAgeFromTerm");
@@ -338,8 +332,8 @@
         if (
           !gaWeeksEl ||
           !gaDaysEl ||
-          !postnatalAgeValueEl ||
-          !postnatalAgeUnitEl ||
+          !postnatalAgeMonthsEl ||
+          !postnatalAgeDaysEl ||
           !prematurityDaysValueEl ||
           !correctedWeeksDaysEl ||
           !correctedAgeFromTermEl ||
@@ -352,13 +346,14 @@
 
         const gaWeeks = Number(gaWeeksEl.value);
         const gaDays = Number(gaDaysEl.value);
-        const postnatalAgeValue = Number(postnatalAgeValueEl.value);
-        const postnatalAgeUnit = postnatalAgeUnitEl.value;
+        const postnatalAgeMonths = Number(postnatalAgeMonthsEl.value);
+        const postnatalAgeDays = Number(postnatalAgeDaysEl.value);
 
         if (
           !Number.isFinite(gaWeeks) ||
           !Number.isFinite(gaDays) ||
-          !Number.isFinite(postnatalAgeValue)
+          !Number.isFinite(postnatalAgeMonths) ||
+          !Number.isFinite(postnatalAgeDays)
         ) {
           errorEl.textContent = "数値を入力してください。";
           return;
@@ -371,12 +366,16 @@
           errorEl.textContent = "在胎週数（日）は0〜6で入力してください。";
           return;
         }
-        if (postnatalAgeValue < 0) {
-          errorEl.textContent = "生後年齢は0以上で入力してください。";
+        if (postnatalAgeMonths < 0 || postnatalAgeDays < 0) {
+          errorEl.textContent = "生後年齢（か月・日）は0以上で入力してください。";
+          return;
+        }
+        if (postnatalAgeDays > 30) {
+          errorEl.textContent = "生後年齢（日）は0〜30で入力してください。";
           return;
         }
 
-        const postnatalDays = toPostnatalDays(postnatalAgeValue, postnatalAgeUnit);
+        const postnatalDays = toPostnatalDays(postnatalAgeMonths, postnatalAgeDays);
         const gestationalAgeDays = gaWeeks * 7 + gaDays;
 
         // 40週（280日）未満で生まれた分だけ修正する
@@ -391,8 +390,8 @@
       function resetForm() {
         const gaWeeksEl = document.getElementById("gaWeeks");
         const gaDaysEl = document.getElementById("gaDays");
-        const postnatalAgeValueEl = document.getElementById("postnatalAgeValue");
-        const postnatalAgeUnitEl = document.getElementById("postnatalAgeUnit");
+        const postnatalAgeMonthsEl = document.getElementById("postnatalAgeMonths");
+        const postnatalAgeDaysEl = document.getElementById("postnatalAgeDays");
         const prematurityDaysValueEl = document.getElementById("prematurityDaysValue");
         const correctedWeeksDaysEl = document.getElementById("correctedWeeksDays");
         const correctedAgeFromTermEl = document.getElementById("correctedAgeFromTerm");
@@ -400,8 +399,8 @@
 
         gaWeeksEl.value = "30";
         gaDaysEl.value = "0";
-        postnatalAgeValueEl.value = "60";
-        postnatalAgeUnitEl.value = "days";
+        postnatalAgeMonthsEl.value = "2";
+        postnatalAgeDaysEl.value = "0";
         errorEl.textContent = "";
         prematurityDaysValueEl.textContent = "-";
         correctedWeeksDaysEl.textContent = "-";
