@@ -1,4 +1,4 @@
-const CACHE_NAME = "corrected-age-app-v2";
+const CACHE_NAME = "corrected-age-app-v3";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.png"];
 
 self.addEventListener("install", (event) => {
@@ -18,6 +18,26 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+  const isDocument =
+    event.request.mode === "navigate" ||
+    (isSameOrigin && (url.pathname === "/" || url.pathname.endsWith("/index.html")));
+
+  // For HTML, prefer fresh network content and fall back to cache when offline.
+  if (isDocument) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
